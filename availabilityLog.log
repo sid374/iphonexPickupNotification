@@ -1,0 +1,13 @@
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): www.apple.com
+DEBUG:urllib3.connectionpool:https://www.apple.com:443 "GET /shop/retail/pickup-message?pl=true&cppart=TMOBILE/US&parts.0=MQAQ2LL/A&location=33308 HTTP/1.1" 200 17252
+INFO:__main__:The Galleria: unavailable
+INFO:__main__:Boca Raton: unavailable
+INFO:__main__:Aventura: unavailable
+INFO:__main__:Lincoln Road: unavailable
+INFO:__main__:Brickell City Centre: unavailable
+INFO:__main__:Wellington Green: unavailable
+INFO:__main__:Dadeland: unavailable
+INFO:__main__:The Falls: unavailable
+INFO:__main__:Waterside Shops: unavailable
+INFO:__main__:Coconut Point: unavailable
+INFO:__main__:University Town Center: unavailable
