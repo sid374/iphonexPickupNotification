@@ -40,6 +40,7 @@ def sendEmail(content='Test'):
 	try:
 		yag = yagmail.SMTP('sidautoemail')
 		yag.send(to = 'sid.bidasaria@gmail.com', contents = content)
+		yag.send(to = 'anupriya.bidasaria1996@gmail.com', contents = content)
 	except:
 		e = sys.exc_info()[0]
 		logger.error('Sending email failed')
