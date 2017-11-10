@@ -36,15 +36,18 @@ def checkAvailibilityForModel(modelCode='MQAQ2LL/A', zipCode = '33308', descript
 		else:
 			logger.log(logging.INFO, store['storeName'] + ': ' + description + ' AVAILABLE!' + ' Zip: ' + zipCode)
 			logger.log(logging.DEBUG, store)
-			sendEmail("Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode))
+			if zipCode == '33308' or '64' in description:
+				sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Urgent in {0}".format(zipCode))
+			else:
+				sendEmail("Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Found in {0}".format(zipCode))
 
 
 
-def sendEmail(content='Test'):
+def sendEmail(content='Test', sub = ''):
 	try:
 		yag = yagmail.SMTP('sidautoemail')
-		yag.send(to = 'sid.bidasaria@gmail.com', contents = content)
-		yag.send(to = 'anupriya.bidasaria1996@gmail.com', contents = content)
+		yag.send(to = 'sid.bidasaria@gmail.com', contents = content, subject = sub)
+		yag.send(to = 'anupriya.bidasaria1996@gmail.com', contents = content, subject = sub)
 	except:
 		e = sys.exc_info()[0]
 		logger.error('Sending email failed')
