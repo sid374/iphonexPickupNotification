@@ -1,6 +1,7 @@
 import requests
 import logging
 import yagmail
+import sys
 
 APPLE_BASE_URL_STORE_AVAILABILITY = 'https://www.apple.com/shop/retail/pickup-message?pl=true&cppart=TMOBILE/US&parts.0=' 
 APPLE_URL_LOCATION_EXTENSION = '&location=' 
