@@ -58,7 +58,7 @@ def checkAvailability():
 	for model in modelList:
 		for zipcode in zipcodeList:
 			checkAvailibilityForModel(zipCode = zipcode, **model)
-
+	sendEmail("Job Finished.")
 
 			
 def main():
