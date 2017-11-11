@@ -41,11 +41,11 @@ def checkAvailibilityForModel(modelCode='MQAQ2LL/A', zipCode = '33308', descript
 		else:
 			logger.log(logging.INFO, store['storeName'] + ': ' + description + ' AVAILABLE!' + ' Zip: ' + zipCode)
 			logger.log(logging.DEBUG, store)
-			if zipCode == '33308' and '64' in description:
+			if zipCode == '33308' or '64' in description:
 				sendText(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode))
 				sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Woohoo! in {0}".format(zipCode))
-			if zipCode == '33308' or '64' in description:
-				sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Urgent in {0}".format(zipCode))
+			#if zipCode == '33308' or '64' in description:
+			#	sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Urgent in {0}".format(zipCode))
 			else:
 				#too much spam.. commenting
 				#sendEmail("Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Found in {0}".format(zipCode))
