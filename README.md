@@ -12,5 +12,7 @@ How to use:
   
   c. You can configure Urgent Notifications if you want: Urgent notifications gives you the flexibiity of receiving notifications via text/email only if specific zip codes or models (64gb/256gb) are available for pick up. This is handy if you want to monitor multiple zip codes through the log files but only want to receive notifications for the zip codes near you!
   
+  
 2. Setup a cron job to run this script as often as you like!
+
 3. Profit (Or loss.. depends on where you stand)
