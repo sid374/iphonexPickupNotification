@@ -3,6 +3,7 @@ import logging
 import yagmail
 import sys
 import configparser
+import json
 from twilio.rest import Client
 
 
@@ -41,42 +42,74 @@ def checkAvailibilityForModel(modelCode='MQAQ2LL/A', zipCode = '33308', descript
 		else:
 			logger.log(logging.INFO, store['storeName'] + ': ' + description + ' AVAILABLE!' + ' Zip: ' + zipCode)
 			logger.log(logging.DEBUG, store)
-			if zipCode == '33308' or '64' in description:
+
+			#If the urgentonly flag is on in the config file then do this
+			if config.getboolean('Notifications', 'urgentOnly') and isUrgent(zipC = zipCode, modelDescription = description):
 				sendText(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode))
 				sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Woohoo! in {0}".format(zipCode))
-			#if zipCode == '33308' or '64' in description:
-			#	sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Urgent in {0}".format(zipCode))
+			elif config.getboolean('Notifications', 'urgentOnly') == False:
+				sendText(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode))
+				sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Woohoo! in {0}".format(zipCode))
 			else:
 				#too much spam.. commenting
 				#sendEmail("Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Found in {0}".format(zipCode))
 				pass
 
 
+def isUrgent(zipC, modelDescription):
+	'''checks if the given zipcode and model are specified in the urgent section of the config file'''
+	urgentZips = []
+	urgentModels = []
+
+	#if urgentZipCodes or urgentModels is not defined in the config file, we treat ALL as urgent!
+	if not config.has_option('UrgentNotification','urgentZipCodes'):
+		urgentZips = json.loads(config.get("Notifications","zipCodeList"))
+	else:
+		urgentZips = json.loads(config.get("UrgentNotification","urgentZipCodes"))
+
+	if not config.has_option('UrgentNotification','urgentModels'):
+		urgentModels = ["64", "256"]
+	else:
+		urgentModels = json.loads(config.get("UrgentNotification","urgentModels"))
+
+	if zipC in urgentZips:
+		for model in urgentModels:
+			if model in modelDescription:
+				return True 
+	return False
 
 def sendEmail(content='Test', sub = ''):
+	if not config.has_option('Notifications','phoneList'):
+		return
+
+	emailList = json.loads(config.get("Notifications","emailList"))
 	try:
 		yag = yagmail.SMTP('sidautoemail')
-		yag.send(to = 'sid.bidasaria@gmail.com', contents = content, subject = sub)
-		yag.send(to = 'anupriya.bidasaria1996@gmail.com', contents = content, subject = sub)
+		for email in emailList:
+			yag.send(to = email, contents = content, subject = sub)
 	except:
 		e = sys.exc_info()[0]
 		logger.error('Sending email failed')
 
 
-def sendText(to="4017495246", content = 'iphonex notification'):
-	if 'Twilio' not in config.sections():
+def sendText(content = 'iphonex notification'):
+	if 'Twilio' not in config.sections() or not config.has_option('Notifications','phoneList'):
 		return
 
 	if config.has_option('Twilio', 'sid') and config.has_option('Twilio', 'auth') and config.has_option('Twilio', 'outgoingPhone'):
 		account_sid = config.get('Twilio', 'sid')
 		auth_token = config.get('Twilio', 'auth')
-		phone = config.get('Twilio', 'outgoingPhone')
+		twilPhone = config.get('Twilio', 'outgoingPhone')
 
 		client = Client(account_sid, auth_token)
-		message = client.messages.create(
-		    to="+14017495246", 
-		    from_=  phone,
-		    body=content)
+
+		phoneList = json.loads(config.get("Notifications","phoneList"))
+
+		for phone in phoneList:
+			message = client.messages.create(
+			    to=phone, 
+			    from_=  twilPhone,
+			    body=content)
 
 
 def checkAvailability():
@@ -86,12 +119,12 @@ def checkAvailability():
 	SILVER_256 = {'modelCode' : 'MQAV2LL/A', 'description':'SILVER 256'}
 
 	modelList = [SPACEGRAY_64, SILVER_64, SPACEGRAY_256, SILVER_256]
-	zipcodeList = ['33308', '94116', '98112']
+
+	zipcodeList = json.loads(config.get("Notifications","zipCodeList"))
 
 	for model in modelList:
 		for zipcode in zipcodeList:
 			checkAvailibilityForModel(zipCode = zipcode, **model)
-
 			
 def main():
 	checkAvailability()
