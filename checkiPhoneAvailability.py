@@ -2,6 +2,9 @@ import requests
 import logging
 import yagmail
 import sys
+import configparser
+from twilio.rest import Client
+
 
 APPLE_BASE_URL_STORE_AVAILABILITY = 'https://www.apple.com/shop/retail/pickup-message?pl=true&cppart=TMOBILE/US&parts.0=' 
 APPLE_URL_LOCATION_EXTENSION = '&location=' 
@@ -20,6 +23,9 @@ ch.setLevel(logging.DEBUG)
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+config = configparser.ConfigParser()
+config.read('config.ini')
+
 def checkAvailibilityForModel(modelCode='MQAQ2LL/A', zipCode = '33308', description= 'iphone' ):
 	''' Checks the in store pick up availability for the modelcode and zipcode provided'''
 	availability_url = APPLE_BASE_URL_STORE_AVAILABILITY + modelCode + APPLE_URL_LOCATION_EXTENSION + zipCode
@@ -30,16 +36,20 @@ def checkAvailibilityForModel(modelCode='MQAQ2LL/A', zipCode = '33308', descript
 		
 	jsonData = r.json()
 	for store in jsonData['body']['stores']:
-		#print store['storeName']
 		if store['partsAvailability'][modelCode]['pickupDisplay'] == 'unavailable' or store['partsAvailability'][modelCode]['pickupSearchQuote'] == 'Currently unavailable':
 			logger.log(logging.INFO, store['storeName'] + ': ' + description + ' unavailable' + ' Zip: ' + zipCode)
 		else:
 			logger.log(logging.INFO, store['storeName'] + ': ' + description + ' AVAILABLE!' + ' Zip: ' + zipCode)
 			logger.log(logging.DEBUG, store)
+			if zipCode == '33308' and '64' in description:
+				sendText(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode))
+				sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Woohoo! in {0}".format(zipCode))
 			if zipCode == '33308' or '64' in description:
 				sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Urgent in {0}".format(zipCode))
 			else:
-				sendEmail("Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Found in {0}".format(zipCode))
+				#too much spam.. commenting
+				#sendEmail("Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Found in {0}".format(zipCode))
+				pass
 
 
 
@@ -52,6 +62,21 @@ def sendEmail(content='Test', sub = ''):
 		e = sys.exc_info()[0]
 		logger.error('Sending email failed')
 
+
+def sendText(to="4017495246", content = 'iphonex notification'):
+	if 'Twilio' not in config.sections():
+		return
+
+	if config.has_option('Twilio', 'sid') and config.has_option('Twilio', 'auth') and config.has_option('Twilio', 'outgoingPhone'):
+		account_sid = config.get('Twilio', 'sid')
+		auth_token = config.get('Twilio', 'auth')
+		phone = config.get('Twilio', 'outgoingPhone')
+
+		client = Client(account_sid, auth_token)
+		message = client.messages.create(
+		    to="+14017495246", 
+		    from_=  phone,
+		    body=content)
 
 
 def checkAvailability():
@@ -66,7 +91,6 @@ def checkAvailability():
 	for model in modelList:
 		for zipcode in zipcodeList:
 			checkAvailibilityForModel(zipCode = zipcode, **model)
-	sendEmail("Job Finished.")
 
 			
 def main():
