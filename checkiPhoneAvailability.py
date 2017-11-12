@@ -6,7 +6,6 @@ import configparser
 import json
 from twilio.rest import Client
 
-
 APPLE_BASE_URL_STORE_AVAILABILITY = 'https://www.apple.com/shop/retail/pickup-message?pl=true&cppart=TMOBILE/US&parts.0=' 
 APPLE_URL_LOCATION_EXTENSION = '&location=' 
 
@@ -45,6 +44,7 @@ def checkAvailibilityForModel(modelCode='MQAQ2LL/A', zipCode = '33308', descript
 
 			#If the urgentonly flag is on in the config file then do this
 			if config.getboolean('Notifications', 'urgentOnly') and isUrgent(zipC = zipCode, modelDescription = description):
+				logger.log(logging.DEBUG, "In urgent only")
 				sendText(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode))
 				sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Woohoo! in {0}".format(zipCode))
 			elif config.getboolean('Notifications', 'urgentOnly') == False:
@@ -60,7 +60,6 @@ def isUrgent(zipC, modelDescription):
 	'''checks if the given zipcode and model are specified in the urgent section of the config file'''
 	urgentZips = []
 	urgentModels = []
-
 	#if urgentZipCodes or urgentModels is not defined in the config file, we treat ALL as urgent!
 	if not config.has_option('UrgentNotification','urgentZipCodes'):
 		urgentZips = json.loads(config.get("Notifications","zipCodeList"))
@@ -73,9 +72,12 @@ def isUrgent(zipC, modelDescription):
 		urgentModels = json.loads(config.get("UrgentNotification","urgentModels"))
 
 	if zipC in urgentZips:
-		for model in urgentModels:
-			if model in modelDescription:
-				return True 
+		return True
+
+	for model in urgentModels:
+		if model in modelDescription:
+			return True 
+
 	return False
 
 def sendEmail(content='Test', sub = ''):
