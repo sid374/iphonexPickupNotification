@@ -44,7 +44,6 @@ def checkAvailibilityForModel(modelCode='MQAQ2LL/A', zipCode = '33308', descript
 
 			#If the urgentonly flag is on in the config file then do this
 			if config.getboolean('Notifications', 'urgentOnly') and isUrgent(zipC = zipCode, modelDescription = description):
-				logger.log(logging.DEBUG, "In urgent only")
 				sendText(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode))
 				sendEmail(content = "Phone {0} available at {1} {2}".format(description, store['storeName'], zipCode), sub = "Woohoo! in {0}".format(zipCode))
 			elif config.getboolean('Notifications', 'urgentOnly') == False:
