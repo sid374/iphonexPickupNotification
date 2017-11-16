@@ -6,6 +6,7 @@ import configparser
 import json
 from twilio.rest import Client
 
+APPLE_BASE_URL_STORE_AVAILABILITY_ATT = 'https://www.apple.com/shop/retail/pickup-message?pl=true&cppart=ATT/US&parts.0=' 
 APPLE_BASE_URL_STORE_AVAILABILITY = 'https://www.apple.com/shop/retail/pickup-message?pl=true&cppart=TMOBILE/US&parts.0=' 
 APPLE_URL_LOCATION_EXTENSION = '&location=' 
 
@@ -118,6 +119,11 @@ def checkAvailability():
 	SILVER_64 = {'modelCode':'MQAR2LL/A', 'description':'SILVER 64'}
 	SPACEGRAY_256 = {'modelCode':'MQAU2LL/A', 'description':'SPACE GRAY 256'}
 	SILVER_256 = {'modelCode' : 'MQAV2LL/A', 'description':'SILVER 256'}
+
+	SPACEGRAY_64_ATT = {'modelCode':'MQAJ2LL/A', 'description':'SPACE GRAY 64 ATT'}
+	SILVER_64_ATT = {'modelCode':'MQAK2LL/A', 'description':'SILVER 64 ATT'}
+	SPACEGRAY_256_ATT = {'modelCode':'MQAM2LL/A', 'description':'SPACE GRAY 256 ATT'}
+	SILVER_256_ATT = {'modelCode':'MQAN2LL/A', 'description':'SILVER 256 ATT'}
 
 	modelList = [SPACEGRAY_64, SILVER_64, SPACEGRAY_256, SILVER_256]
 
